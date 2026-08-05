@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Interactivo de Python</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Menú Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <i class="fa-brands fa-python"></i>
+                <span>Python Teens</span>
+            </div>
+            <nav class="unit-menu" id="unit-menu">
+                <!-- Se genera dinámicamente con JS -->
+            </nav>
+        </aside>
 
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button id="menu-toggle" class="btn-icon"><i class="fa-solid fa-bars"></i></button>
+                <h1 id="unit-title">Cargando unidad...</h1>
+            </header>
+
+            <div class="content-wrapper" id="unit-content">
+                <!-- Se renderiza el contenido según la unidad seleccionada -->
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
