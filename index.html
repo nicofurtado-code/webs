@@ -1,38 +1,1307 @@
-<!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curso Interactivo de Python</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Rocky Tutorials | Aprende Python de Cero a Pro 🛡️🐍</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Skulpt In-Browser Python Interpreter -->
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #090d16;
+            --bg-sidebar: #0f172a;
+            --bg-card: #161e31;
+            --bg-card-hover: #1e2942;
+            --bg-code: #050811;
+            
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --viking-gold: #f59e0b;
+            --viking-gold-glow: rgba(245, 158, 11, 0.25);
+            --accent-purple: #a855f7;
+            --success: #10b981;
+            --danger: #ef4444;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #26334d;
+            
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, transparent 100%);
+        }
+
+        .viking-logo {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--viking-gold), #b45309);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--viking-gold-glow);
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .brand-title h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, var(--viking-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title p {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Progress Bar */
+        .overall-progress {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .progress-track {
+            height: 8px;
+            background-color: var(--bg-code);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--viking-gold));
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        /* Navigation List */
+        .unit-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 14px 16px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: left;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.15), rgba(245, 158, 11, 0.05));
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .nav-btn.completed i::after {
+            content: " ✓";
+            color: var(--success);
+        }
+
+        /* Main Workspace */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .top-navbar {
+            height: 70px;
+            background-color: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .current-unit-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .content-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            scroll-behavior: smooth;
+        }
+
+        .container-max {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 35px;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            opacity: 0.35;
+            filter: saturate(1.4);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, var(--bg-card) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-subtitle {
+            color: var(--primary);
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        /* Card Sections */
+        .card-block {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: border-color 0.2s;
+        }
+
+        .card-block:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+        }
+
+        .section-header i {
+            font-size: 1.4rem;
+            color: var(--viking-gold);
+        }
+
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        p {
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+
+        b, strong {
+            color: var(--text-main);
+        }
+
+        /* Grid Concept Cards */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .concept-card {
+            background-color: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            background-color: var(--bg-card-hover);
+        }
+
+        .concept-card h3 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Interactive Code Runner Box */
+        .code-box {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 24px;
+            background-color: var(--bg-code);
+        }
+
+        .code-header {
+            background-color: #0b0f19;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-run:hover {
+            opacity: 0.9;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        textarea.code-editor {
+            width: 100%;
+            height: 140px;
+            background-color: var(--bg-code);
+            color: #38bdf8;
+            font-family: var(--font-code);
+            font-size: 0.92rem;
+            padding: 16px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .terminal-output {
+            background-color: #02040a;
+            border-top: 1px solid var(--border-color);
+            padding: 14px 18px;
+            font-family: var(--font-code);
+            font-size: 0.88rem;
+            color: #a7f3d0;
+            min-height: 48px;
+            max-height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .terminal-output .error {
+            color: #f87171;
+        }
+
+        /* Quiz Box */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .quiz-item {
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 22px;
+        }
+
+        .quiz-question {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-bottom: 16px;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: left;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quiz-option:hover:not(:disabled) {
+            border-color: var(--primary);
+            background-color: var(--bg-card-hover);
+        }
+
+        .quiz-option.correct {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            border-color: var(--success) !important;
+            color: #34d399 !important;
+        }
+
+        .quiz-option.incorrect {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            border-color: var(--danger) !important;
+            color: #f87171 !important;
+        }
+
+        .quiz-feedback {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .quiz-feedback.show-error {
+            display: block;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .quiz-feedback.show-success {
+            display: block;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .wobble {
+            animation: wobble 0.4s ease-in-out;
+        }
+
+        .exercise-card {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--primary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .btn-solution {
+            background: linear-gradient(135deg, var(--viking-gold), #d97706);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-solution:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 0;
+                bottom: 0;
+            }
+
+            .sidebar.open {
+                left: 0;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .content-scrollable {
+                padding: 20px 16px;
+            }
+
+            .hero-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
 </head>
 <body>
+
     <div class="app-container">
-        <!-- Menú Lateral -->
+        <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <i class="fa-brands fa-python"></i>
-                <span>Python Teens</span>
+            <div class="brand-header">
+                <div class="viking-logo">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="brand-title">
+                    <h1>Rocky Tutorials</h1>
+                    <p>Python Academy 🐍</p>
+                </div>
             </div>
-            <nav class="unit-menu" id="unit-menu">
-                <!-- Se genera dinámicamente con JS -->
+
+            <div class="overall-progress">
+                <div class="progress-info">
+                    <span>Progreso del Curso</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <nav class="unit-nav" id="unit-nav">
+                <!-- Navigation Items -->
             </nav>
         </aside>
 
-        <!-- Contenido Principal -->
+        <!-- Main Workspace -->
         <main class="main-content">
-            <header class="top-bar">
-                <button id="menu-toggle" class="btn-icon"><i class="fa-solid fa-bars"></i></button>
-                <h1 id="unit-title">Cargando unidad...</h1>
+            <header class="top-navbar">
+                <button class="mobile-toggle" id="menu-toggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="current-unit-badge" id="current-badge">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>Cargando contenido...</span>
+                </div>
             </header>
 
-            <div class="content-wrapper" id="unit-content">
-                <!-- Se renderiza el contenido según la unidad seleccionada -->
+            <div class="content-scrollable">
+                <div class="container-max" id="main-render-area">
+                    <!-- Dynamic Content -->
+                </div>
             </div>
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Full Curriculum Data
+        const curriculum = [
+            {
+                id: 0,
+                title: "Introducción al Código",
+                icon: "fa-shield-cat",
+                heroImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Fundamentos clave: Algoritmos, datos y la lógica detrás del software.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-terminal"></i>
+                            <h2>1. ¿Qué es la Programación?</h2>
+                        </div>
+                        <p>Imagina que la computadora es un guerrero vikingo súper obediente pero <b>totalmente literal</b>. No entiende lenguaje humano directo; necesita órdenes paso a paso escritas en un idioma que pueda procesar. <b>Programar</b> es el arte de escribir esas instrucciones usando un lenguaje de programación (como Python) para crear desde un videojuego en 3D hasta tu red social favorita.</p>
+                    </div>
+
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-diagram-project"></i>
+                            <h2>2. Algoritmos: La Receta del Éxito</h2>
+                        </div>
+                        <p>Un <b>algoritmo</b> es simplemente una secuencia finita y ordenada de pasos para resolver un problema. Cuando preparas un cereal, sigues un algoritmo: 1. Tomas el plato, 2. Servir cereal, 3. Agregar leche.</p>
+
+                        <h3 style="color: var(--primary); margin: 20px 0 10px;">5 Características Clave de todo Algoritmo:</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h3><i class="fa-solid fa-bullseye"></i> 1. Preciso</h3>
+                                <p>Cada paso debe estar perfectamente claro sin margen a confusiones.</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><i class="fa-solid fa-crosshairs"></i> 2. Definido</h3>
+                                <p>Si ejecutas el algoritmo 100 veces con los mismos datos, obtendrás el mismo resultado.</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><i class="fa-solid fa-hourglass-end"></i> 3. Finito</h3>
+                                <p>Debe tener un final. No puede quedarse ejecutándose infinitamente.</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><i class="fa-solid fa-right-to-bracket"></i> 4. Entradas/Salidas</h3>
+                                <p>Recibe datos iniciales (Inputs) y genera un resultado final (Outputs).</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><i class="fa-solid fa-bolt"></i> 5. Efectivo</h3>
+                                <p>Cada instrucción debe ser realizable y práctica.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-cubes-stacked"></i>
+                            <h2>3. Tipos de Programación (Paradigmas)</h2>
+                        </div>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h3>Imperativa</h3>
+                                <p>Le dices a la máquina exactamente cómo hacer las cosas paso por paso.</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3>Estructurada</h3>
+                                <p>Organiza el código en bloques y funciones para evitar el desorden.</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3>Orientada a Objetos (POO)</h3>
+                                <p>Modela el código imitando objetos del mundo real con características y acciones.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-database"></i>
+                            <h2>4. Tipos de Datos Fundamentales</h2>
+                        </div>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h3><code>int</code> (Enteros)</h3>
+                                <p>Números sin decimales. Ejemplos: <code>15</code>, <code>0</code>, <code>-42</code></p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><code>float</code> (Decimales)</h3>
+                                <p>Números con punto decimal. Ejemplos: <code>9.5</code>, <code>3.1416</code></p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><code>str</code> (Texto / Strings)</h3>
+                                <p>Cadenas de caracteres entre comillas. Ejemplo: <code>"Hola Vikingo"</code></p>
+                            </div>
+                            <div class="concept-card">
+                                <h3><code>bool</code> (Booleanos)</h3>
+                                <p>Valores lógicos: <code>True</code> (Verdadero) o <code>False</code> (Falso)</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                initialCode: `# Este es un comentario en Python
+nombre_jugador = "Ragnar"   # String (str)
+nivel = 15                  # Entero (int)
+salud = 98.5                # Decimal (float)
+es_vikingo = True          # Booleano (bool)
+
+print("¡Bienvenido a Rocky Tutorials!")
+print("Jugador:", nombre_jugador, "| Nivel:", nivel)`,
+                exercises: [
+                    {
+                        task: "Identifica qué tipo de dato sería ideal para guardar: 1. Cantidad de vidas, 2. Precio de un juego ($59.99), 3. Nombre de tu clan.",
+                        solution: "# 1. Vidas -> int (entero, ej: 3)\n# 2. Precio -> float (decimal, ej: 59.99)\n# 3. Clan -> str (texto, ej: 'Vikingos de Asgard')\nprint('Vidas: int | Precio: float | Clan: str')"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "¿Cuál de las siguientes NO es una característica obligatoria de un algoritmo?",
+                        options: [
+                            "Debe ser infinito y no terminar jamás",
+                            "Debe ser preciso",
+                            "Debe ser definido",
+                            "Debe ser finito"
+                        ],
+                        correct: 0
+                    },
+                    {
+                        question: "¿Qué tipo de dato almacena el valor True o False?",
+                        options: [
+                            "String (str)",
+                            "Integer (int)",
+                            "Boolean (bool)",
+                            "Float (float)"
+                        ],
+                        correct: 2
+                    }
+                ]
+            },
+            {
+                id: 1,
+                title: "Unidad 1: Variables y Operaciones",
+                icon: "fa-code",
+                heroImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Aprende a guardar datos en variables y realizar operaciones matemáticas.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <h2>Variables: Cajas de Memoria</h2>
+                        </div>
+                        <p>Una <b>variable</b> es como un cofre con una etiqueta. Guardas un valor dentro y puedes usarlo o modificarlo más adelante.</p>
+                        
+                        <h3 style="color: var(--primary); margin-top: 15px;">Operadores Matemáticos:</h3>
+                        <ul>
+                            <li><code>+</code> Suma</li>
+                            <li><code>-</code> Resta</li>
+                            <li><code>*</code> Multiplicación</li>
+                            <li><code>/</code> División (devuelve <code>float</code>)</li>
+                            <li><code>//</code> División Entera</li>
+                            <li><code>%</code> Módulo (residuo)</li>
+                            <li><code>**</code> Potencia</li>
+                        </ul>
+                    </div>
+                `,
+                initialCode: `oro_inicial = 100
+monedas_ganadas = 45
+oro_total = oro_inicial + monedas_ganadas
+
+print("Oro acumulado:", oro_total)
+
+numero = 10
+residuo = numero % 2
+print("Residuo al dividir entre 2:", residuo)`,
+                exercises: [
+                    {
+                        task: "Crea una variable `base = 10` y `altura = 5`. Calcula el área de un triángulo usando (base * altura) / 2 y muéstrala.",
+                        solution: "base = 10\naltura = 5\narea = (base * altura) / 2\nprint('El área del triángulo es:', area)"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "¿Qué resultado da el operador de módulo % en la expresión `7 % 2`?",
+                        options: [
+                            "3.5",
+                            "1",
+                            "3",
+                            "0"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Unidad 2: Condicionales (Toma de Decisiones)",
+                icon: "fa-code-branch",
+                heroImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Controla el flujo de tu programa con `if`, `elif` y `else`.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-code-fork"></i>
+                            <h2>Tomando caminos en el código</h2>
+                        </div>
+                        <p>Con las condicionales, tu programa ejecuta ciertos bloques <b>solo si</b> se cumple una regla.</p>
+                        
+                        <h3 style="color: var(--primary); margin-top: 15px;">Operadores de Comparación:</h3>
+                        <ul>
+                            <li><code>==</code> Igual a</li>
+                            <li><code>!=</code> Diferente de</li>
+                            <li><code>&gt;</code> Mayor que | <code>&lt;</code> Menor que</li>
+                        </ul>
+                    </div>
+                `,
+                initialCode: `nivel_usuario = 25
+
+if nivel_usuario >= 50:
+    print("🏆 ¡Eres un Maestro Vikingo!")
+elif nivel_usuario >= 18:
+    print("⚔️ Eres un Guerrero Experimentado.")
+else:
+    print("🛡️ Eres un Aprendiz.")`,
+                exercises: [
+                    {
+                        task: "Crea una variable `nota = 85`. Si sacó 60 o más, imprime 'Aprobado', si no, imprime 'Reprobado'.",
+                        solution: "nota = 85\nif nota >= 60:\n    print('¡Aprobado!')\nelse:\n    print('Reprobado')"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "¿Cuál es el operador correcto para comprobar si dos variables son idénticas?",
+                        options: [
+                            "=",
+                            "==",
+                            "equals",
+                            "matches"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Unidad 3: Bucles e Iteraciones",
+                icon: "fa-rotate",
+                heroImage: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Automatiza tareas repetitivas con `for` y `while`.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-arrows-spin"></i>
+                            <h2>Repetición Inteligente</h2>
+                        </div>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h3>Bucle <code>for</code></h3>
+                                <p>Se usa cuando sabes cuántas veces repetirás una instrucción.</p>
+                            </div>
+                            <div class="concept-card">
+                                <h3>Bucle <code>while</code></h3>
+                                <p>Se repite mientras una condición se mantenga verdadera.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                initialCode: `# Bucle FOR
+for i in range(1, 6):
+    print("Ronda número:", i)
+
+# Bucle WHILE
+energia = 3
+while energia > 0:
+    print("Luchando... Energía restante:", energia)
+    energia -= 1
+print("¡Descansa!")`,
+                exercises: [
+                    {
+                        task: "Usa un bucle `for` para imprimir los números pares del 2 al 10.",
+                        solution: "for num in range(2, 11, 2):\n    print(num)"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "¿Qué valores genera `range(1, 5)` al recorrerlo en un bucle?",
+                        options: [
+                            "1, 2, 3, 4, 5",
+                            "1, 2, 3, 4",
+                            "0, 1, 2, 3, 4",
+                            "5, 5, 5, 5"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Unidad 4: Listas y Diccionarios",
+                icon: "fa-list-check",
+                heroImage: "https://images.unsplash.com/photo-1516116211223-48a12788c360?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Organiza colecciones complejas de información.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <h2>Estructuras de Datos</h2>
+                        </div>
+                        <ul>
+                            <li><b>Listas <code>[]</code>:</b> Colecciones ordenadas de elementos. Índice inicial: <code>0</code>.</li>
+                            <li><b>Diccionarios <code>{}</code>:</b> Colecciones por pares <code>clave : valor</code>.</li>
+                        </ul>
+                    </div>
+                `,
+                initialCode: `# Manejo de Listas
+inventario = ["Hacha", "Escudo", "Poción"]
+inventario.append("Casco")
+print("Primer item:", inventario[0])
+
+# Manejo de Diccionarios
+perfil = {
+    "usuario": "Rocky",
+    "puntos": 1250
+}
+print("Puntos de", perfil["usuario"], ":", perfil["puntos"])`,
+                exercises: [
+                    {
+                        task: "Crea una lista `juegos` con 3 títulos. Agrega un cuarto con `.append()` y elimina el primero con `del juegos[0]`.",
+                        solution: "juegos = ['Minecraft', 'Valorant', 'Fortnite']\njuegos.append('Roblox')\ndel juegos[0]\nprint('Lista actualizada:', juegos)"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "Si la lista es `items = ['Espada', 'Escudo']`, ¿qué índice tiene 'Espada'?",
+                        options: [
+                            "1",
+                            "0",
+                            "-1",
+                            "primer"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Unidad 5: Funciones y Modularidad",
+                icon: "fa-gears",
+                heroImage: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Crea bloques de código reutilizables con `def`.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-gears"></i>
+                            <h2>Bloques Reutilizables</h2>
+                        </div>
+                        <p>Una <b>función</b> empaqueta código para que lo ejecutes cuantas veces quieras mediante su nombre.</p>
+                    </div>
+                `,
+                initialCode: `def calcular_dano(dano_base, multiplicador):
+    return dano_base * multiplicador
+
+impacto = calcular_dano(50, 1.5)
+print("Daño del ataque crítico:", impacto)`,
+                exercises: [
+                    {
+                        task: "Escribe una función `es_mayor(edad)` que devuelva True si edad >= 18 o False en caso contrario.",
+                        solution: "def es_mayor(edad):\n    return edad >= 18\n\nprint(es_mayor(15)) # Devuelve False"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "¿Qué instrucción devuelve un valor desde una función?",
+                        options: [
+                            "send",
+                            "return",
+                            "output",
+                            "give"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Unidad 6: Programación Orientada a Objetos",
+                icon: "fa-cubes",
+                heroImage: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+                subtitle: "Modela elementos complejos con Clases y Objetos.",
+                theory: `
+                    <div class="card-block">
+                        <div class="section-header">
+                            <i class="fa-solid fa-shapes"></i>
+                            <h2>El Paradigma POO</h2>
+                        </div>
+                        <p>Una <b>Clase</b> es el molde y los <b>Objetos</b> son las creaciones individuales con atributos y métodos.</p>
+                    </div>
+                `,
+                initialCode: `class Vikingo:
+    def __init__(self, nombre, fuerza):
+        self.nombre = nombre
+        self.fuerza = fuerza
+
+    def atacar(self):
+        print(self.nombre, "ataca con fuerza de", self.fuerza)
+
+hero1 = Vikingo("Bjorn", 85)
+hero1.atacar()`,
+                exercises: [
+                    {
+                        task: "Crea una clase `Mascota` con atributos `nombre` y `tipo` y un método `saludar()`.",
+                        solution: "class Mascota:\n    def __init__(self, nombre, tipo):\n        self.nombre = nombre\n        self.tipo = tipo\n    def saludar(self):\n        print('Hola, soy', self.nombre)\n\nmi_gato = Mascota('Michi', 'Gato')\nmi_gato.saludar()"
+                    }
+                ],
+                quiz: [
+                    {
+                        question: "¿Qué método especial define el constructor de una clase?",
+                        options: [
+                            "def constructor()",
+                            "def __init__()",
+                            "class create()",
+                            "def make()"
+                        ],
+                        correct: 1
+                    }
+                ]
+            }
+        ];
+
+        // State Tracking
+        let currentUnitIndex = 0;
+        let completedUnits = new Set();
+
+        // DOM Elements
+        const unitNav = document.getElementById('unit-nav');
+        const mainRenderArea = document.getElementById('main-render-area');
+        const currentBadge = document.getElementById('current-badge');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+
+        function initApp() {
+            renderNav();
+            loadUnit(0);
+            
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+
+        function renderNav() {
+            unitNav.innerHTML = curriculum.map((unit, idx) => `
+                <button class="nav-btn ${idx === 0 ? 'active' : ''} ${completedUnits.has(idx) ? 'completed' : ''}" 
+                        onclick="selectUnit(${idx})">
+                    <i class="fa-solid ${unit.icon}"></i>
+                    <span>${unit.title}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectUnit(index) {
+            currentUnitIndex = index;
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+            loadUnit(index);
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('open');
+            }
+        }
+
+        function loadUnit(index) {
+            const unit = curriculum[index];
+            currentBadge.innerHTML = `<i class="fa-solid ${unit.icon}"></i> <span>${unit.title}</span>`;
+
+            let html = `
+                <div class="hero-banner">
+                    <img src="${unit.heroImage}" alt="${unit.title}" class="hero-image">
+                    <div class="hero-overlay">
+                        <h1 class="hero-title"><i class="fa-solid ${unit.icon}"></i> ${unit.title}</h1>
+                        <p class="hero-subtitle">${unit.subtitle}</p>
+                    </div>
+                </div>
+
+                ${unit.theory}
+
+                <!-- Python Runner Code Box -->
+                <div class="card-block">
+                    <div class="section-header">
+                        <i class="fa-solid fa-laptop-code"></i>
+                        <h2>Editor Interactivo de Python</h2>
+                    </div>
+                    <p>Prueba y ejecuta tu código Python directamente en tu navegador:</p>
+                    <div class="code-box">
+                        <div class="code-header">
+                            <span>ejemplo_unidad_${index}.py</span>
+                            <div class="code-actions">
+                                <button class="btn-run" onclick="runPythonCode('editor-main', 'term-main')">
+                                    <i class="fa-solid fa-play"></i> Ejecutar Código
+                                </button>
+                                <button class="copy-btn" onclick="copyEditorCode('editor-main')">
+                                    <i class="fa-regular fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                        </div>
+                        <textarea class="code-editor" id="editor-main">${unit.initialCode}</textarea>
+                        <div class="terminal-output" id="term-main"><i>Presiona "Ejecutar Código" para ver la salida aquí...</i></div>
+                    </div>
+                </div>
+
+                <!-- Practical Exercises -->
+                <div class="card-block">
+                    <div class="section-header">
+                        <i class="fa-solid fa-pen-ruler"></i>
+                        <h2>Desafíos de Código</h2>
+                    </div>
+                    ${unit.exercises.map((ex, exIdx) => `
+                        <div class="exercise-card">
+                            <p><b>Reto ${exIdx + 1}:</b> ${ex.task}</p>
+                            <button class="btn-solution" onclick="toggleSolution(${exIdx})">
+                                <i class="fa-solid fa-eye"></i> Revelar Solución
+                            </button>
+                            <div id="sol-${exIdx}" style="display:none; margin-top:15px;">
+                                <div class="code-box">
+                                    <div class="code-header">
+                                        <span>solucion_${exIdx}.py</span>
+                                        <div class="code-actions">
+                                            <button class="btn-run" onclick="runPythonCode('editor-sol-${exIdx}', 'term-sol-${exIdx}')">
+                                                <i class="fa-solid fa-play"></i> Probar Solución
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <textarea class="code-editor" id="editor-sol-${exIdx}">${ex.solution}</textarea>
+                                    <div class="terminal-output" id="term-sol-${exIdx}"><i>Presiona "Probar Solución"...</i></div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Self-Assessment Quiz -->
+                <div class="card-block">
+                    <div class="section-header">
+                        <i class="fa-solid fa-vial-circle-check"></i>
+                        <h2>Autoevaluación Interactiva</h2>
+                    </div>
+                    <div class="quiz-container">
+                        ${unit.quiz.map((q, qIdx) => `
+                            <div class="quiz-item">
+                                <p class="quiz-question">${qIdx + 1}. ${q.question}</p>
+                                <div class="options-grid">
+                                    ${q.options.map((opt, optIdx) => `
+                                        <button class="quiz-option" 
+                                                id="q-${qIdx}-opt-${optIdx}" 
+                                                onclick="checkQuizAnswer(${index}, ${qIdx}, ${optIdx}, this)">
+                                            <span>${opt}</span>
+                                            <i class="fa-regular fa-circle"></i>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                                <div class="quiz-feedback" id="feedback-${qIdx}"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            mainRenderArea.innerHTML = html;
+            document.querySelector('.content-scrollable').scrollTop = 0;
+        }
+
+        // Skulpt Python Execution Engine
+        function runPythonCode(editorId, terminalId) {
+            const code = document.getElementById(editorId).value;
+            const term = document.getElementById(terminalId);
+            term.innerHTML = '';
+
+            function outf(text) {
+                term.innerHTML += text;
+            }
+
+            function builtinRead(x) {
+                if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                    throw "File not found: '" + x + "'";
+                return Sk.builtinFiles["files"][x];
+            }
+
+            Sk.pre = terminalId;
+            Sk.configure({ output: outf, read: builtinRead });
+
+            Sk.misconceptions = false;
+            const myPromise = Sk.misconceptions ? Sk.importMainWithBody("<stdin>", false, code, true) : Sk.importMainWithBody("<stdin>", false, code, true);
+
+            myPromise.then(
+                function (module) {
+                    if (term.innerHTML.trim() === '') {
+                        term.innerHTML = '<span style="color:#64748b;">(El código se ejecutó sin errores y no produjo salida)</span>';
+                    }
+                },
+                function (err) {
+                    term.innerHTML = `<span class="error">${err.toString()}</span>`;
+                }
+            );
+        }
+
+        // Quiz Logic
+        function checkQuizAnswer(unitIdx, questionIdx, selectedOptIdx, btn) {
+            const qData = curriculum[unitIdx].quiz[questionIdx];
+            const feedbackEl = document.getElementById(`feedback-${questionIdx}`);
+
+            if (selectedOptIdx === qData.correct) {
+                btn.classList.remove('incorrect', 'wobble');
+                btn.classList.add('correct');
+                btn.querySelector('i').className = 'fa-solid fa-circle-check';
+                
+                const parent = btn.parentElement;
+                parent.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+
+                feedbackEl.className = "quiz-feedback show-success";
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Excelente! Respuesta correcta. 🛡️🔥';
+
+                markUnitComplete(unitIdx);
+            } else {
+                btn.classList.add('incorrect', 'wobble');
+                btn.querySelector('i').className = 'fa-solid fa-circle-xmark';
+                
+                setTimeout(() => {
+                    btn.classList.remove('wobble');
+                }, 400);
+
+                feedbackEl.className = "quiz-feedback show-error";
+                feedbackEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ¡Casi! Revisa la teoría e inténtalo de nuevo. 💪';
+            }
+        }
+
+        function markUnitComplete(unitIdx) {
+            completedUnits.add(unitIdx);
+            renderNav();
+            
+            const pct = Math.round((completedUnits.size / curriculum.length) * 100);
+            progressFill.style.width = `${pct}%`;
+            progressPercent.textContent = `${pct}%`;
+        }
+
+        function toggleSolution(id) {
+            const sol = document.getElementById(`sol-${id}`);
+            sol.style.display = sol.style.display === "none" ? "block" : "none";
+        }
+
+        function copyEditorCode(editorId) {
+            const text = document.getElementById(editorId).value;
+            navigator.clipboard.writeText(text);
+        }
+
+        window.onload = initApp;
+    </script>
 </body>
 </html>
